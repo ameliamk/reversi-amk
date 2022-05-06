@@ -14,8 +14,6 @@ if (typeof port == undefined || port === undefined) {
   directory = "./public";
 }
 
-console.log("port", port);
-console.log(process.env.PORT);
 // Set up static file web server to deliver files
 let file = new static.Server(directory);
 
