@@ -9,7 +9,7 @@ let port = process.env.PORT;
 let directory = __dirname + "/public";
 
 // If not on Heroku, adjust port + directory
-if (typeof port == undefined || port === undefined) {
+if (typeof port == "undefined" || port === null) {
   port = 8080;
   directory = "./public";
 }
