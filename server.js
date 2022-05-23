@@ -107,82 +107,83 @@ io.on("connection", (socket) => {
 
             // Tell everyone that a new user has joined the chatroom
             io.of("/").to(room).emit("join_room_response", response);
+            socket.emit("join_room_succeeded", response);
             serverLog("join_room command succeeded", JSON.stringify(response));
           }
         }
       });
+  });
 
-    socket.on("disconnect", () => {
-      serverLog("a page disconnected from the server: " + socket.id);
-      if (typeof players[socket.id] != "undefined" && players[socket.id] != null) {
-        let payload = {
-          username: players[socket.id].username,
-          room: players[socket.id].room,
-          count: Object.keys(players).length - 1,
-          socket_id: socket.id,
-        };
-        let room = players[socket.id].room;
-        delete players[socket.id];
+  socket.on("disconnect", () => {
+    serverLog("a page disconnected from the server: " + socket.id);
+    if (typeof players[socket.id] != "undefined" && players[socket.id] != null) {
+      let payload = {
+        username: players[socket.id].username,
+        room: players[socket.id].room,
+        count: Object.keys(players).length - 1,
+        socket_id: socket.id,
+      };
 
-        io.of("/").to(room).emit("player_disconnected", payload);
-        serverLog("player_disconnected_succeeded", JSON.stringify(payload));
-      }
-    });
+      let room = players[socket.id].room;
+      delete players[socket.id];
 
-    // send_chat_message command handler
-    socket.on("send_chat_message", (payload) => {
-      serverLog("server received a command \n'send_chat_message'\n " + JSON.stringify(payload));
+      io.of("/").to(room).emit("player_disconnected", payload);
+      serverLog("player_disconnected succeeded", JSON.stringify(payload));
+    }
+  });
 
-      if (typeof payload == "undefined" || payload === null) {
-        response = {};
-        response.result = "fail";
-        response.message = "client did not send a payload";
-        socket.emit("send_chat_message_response", response);
-        serverLog("send_chat_message command failed", JSON.stringify(response));
-        return;
-      }
+  // send_chat_message command handler
+  socket.on("send_chat_message", (payload) => {
+    serverLog("server received a command \n'send_chat_message'\n " + JSON.stringify(payload));
+    if (typeof payload == "undefined" || payload === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a payload";
+      socket.emit("send_chat_message_response", response);
+      serverLog("send_chat_message command failed", JSON.stringify(response));
+      return;
+    }
 
-      let room = payload.room;
-      let username = payload.username;
-      let message = payload.message;
+    let room = payload.room;
+    let username = payload.username;
+    let message = payload.message;
 
-      if (typeof room == "undefined" || room === null) {
-        response = {};
-        response.result = "fail";
-        response.message = "client did not send a valid room to message";
-        socket.emit("send_chat_message_response", response);
-        serverLog("send_chat_message command failed", JSON.stringify(response));
-        return;
-      }
+    if (typeof room == "undefined" || room === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a valid room to message";
+      socket.emit("send_chat_message_response", response);
+      serverLog("send_chat_message command failed", JSON.stringify(response));
+      return;
+    }
 
-      if (typeof username == "undefined" || username === null) {
-        response = {};
-        response.result = "fail";
-        response.message = "client did not send a valid username to message";
-        socket.emit("send_chat_message_response", response);
-        serverLog("send_chat_message command failed", JSON.stringify(response));
-        return;
-      }
+    if (typeof username == "undefined" || username === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a valid username to message";
+      socket.emit("send_chat_message_response", response);
+      serverLog("send_chat_message command failed", JSON.stringify(response));
+      return;
+    }
 
-      if (typeof message == "undefined" || message === null) {
-        response = {};
-        response.result = "fail";
-        response.message = "client did not send a valid message";
-        socket.emit("send_chat_message_response", response);
-        serverLog("send_chat_message command failed", JSON.stringify(response));
-        return;
-      }
+    if (typeof message == "undefined" || message === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a valid message";
+      socket.emit("send_chat_message_response", response);
+      serverLog("send_chat_message command failed", JSON.stringify(response));
+      return;
+    }
 
-      // Handle the command
-      let response = {};
-      response.result = "success";
-      response.username = username;
-      response.room = room;
-      response.message = message;
+    // Handle the command
+    let response = {};
+    response.result = "success";
+    response.username = username;
+    response.room = room;
+    response.message = message;
 
-      // Tell everyone in the room what the message is
-      io.of("/").to(room).emit("send_chat_message_response", response);
-      serverLog("send_chat_message command succeeded", JSON.stringify(response));
-    });
+    // Tell everyone in the room what the message is
+    io.of("/").to(room).emit("send_chat_message_response", response);
+    serverLog("send_chat_message command succeeded", JSON.stringify(response));
   });
 });

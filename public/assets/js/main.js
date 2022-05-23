@@ -14,6 +14,7 @@ function getIRIParameterValue(requestedKey) {
 }
 
 let username = decodeURI(getIRIParameterValue("username"));
+
 if (typeof username == "undefined" || username === null || username === "null") {
   username = "anonymous_" + Math.floor(Math.random() * 1000);
 }
@@ -105,8 +106,9 @@ socket.on("player_disconnected", (payload) => {
   }
 
   let domElements = $(".socket_" + payload.socket_id);
+  console.log("domElements", domElements);
   if (domElements.length !== 0) {
-    return;
+    domElements.hide("fade", 500);
   }
 
   let newHTML =
