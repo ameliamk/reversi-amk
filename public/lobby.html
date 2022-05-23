@@ -16,7 +16,12 @@
         background-color: lightgray;
       }
 
-      .join_room_response {
+      #messagePane {
+        background-color: rgb(183, 183, 183);
+      }
+
+      .join_room_response,
+      .left_room_response {
         margin: 10px 1px 1px 10px;
         background-color: lightgray;
       }
@@ -38,8 +43,15 @@
       </div>
       <div class="row m-3">
         <div class="col">
-          <div class="row align-items-center justify-content-center">
-            <div class="col-8">
+          <div class="row align-items-start justify-content-center">
+            <div class="col-md-4">
+              <h4>Players</h4>
+              <div id="players" class="align-items-end text-right"></div>
+            </div>
+            <div class="col-md-8" id="messagePane">
+              <div>
+                <h4>Messages</h4>
+              </div>
               <div class="input-group">
                 <input
                   id="chatMessage"
@@ -52,9 +64,8 @@
                   Send
                 </button>
               </div>
+              <div id="messages"></div>
             </div>
-            <h4>Messages</h4>
-            <div id="messages"></div>
           </div>
         </div>
       </div>

@@ -29,6 +29,12 @@ socket.on("log", function (array) {
   console.log.apply(console, array);
 });
 
+function makeInviteButton() {
+  let newHTML = "<button type='button' class='btn btn-outline-primary'> Invite </button>";
+  let newNode = $(newHTML);
+  return newNode;
+}
+
 socket.on("join_room_response", (payload) => {
   if (typeof payload == "undefined" || payload === null) {
     console.log("Server did not send a payload");
@@ -40,6 +46,41 @@ socket.on("join_room_response", (payload) => {
     return;
   }
 
+  if (payload.socket_id === socket.id) {
+    return;
+  }
+
+  let domElements = $(".socket_" + payload.socket_id);
+  if (domElements.length !== 0) {
+    return;
+  }
+
+  let nodeA = $("<div></div>");
+  nodeA.addClass("row");
+  nodeA.addClass("align-items-center");
+  nodeA.addClass("socket_" + payload.socket_id);
+  nodeA.hide();
+
+  let nodeB = $("<div></div>");
+  nodeB.addClass("col");
+  nodeB.addClass("text-end");
+  nodeA.addClass("socket_" + payload.socket_id);
+  nodeB.append("<h4>" + payload.username + "</h4>");
+
+  let nodeC = $("<div></div>");
+  nodeC.addClass("col");
+  nodeC.addClass("text-start");
+  nodeC.addClass("socket_" + payload.socket_id);
+  let buttonC = makeInviteButton();
+  nodeC.append(buttonC);
+
+  nodeA.append(nodeB);
+  nodeA.append(nodeC);
+
+  $("#players").append(nodeA);
+  nodeA.show("fade", 1000);
+
+  // Announce new player
   let newHTML =
     "<p class='join_room_response'>" +
     payload.username +
@@ -58,6 +99,15 @@ socket.on("join_room_response", (payload) => {
 socket.on("player_disconnected", (payload) => {
   if (typeof payload == "undefined" || payload === null) {
     console.log("Server did not send a payload");
+    return;
+  }
+
+  if (payload.socket_id === socket.id) {
+    return;
+  }
+
+  let domElements = $(".socket_" + payload.socket_id);
+  if (domElements.length !== 0) {
     return;
   }
 

@@ -97,7 +97,6 @@ io.on("connection", (socket) => {
           players[socket.id] = { username: username, room: room };
 
           // Announce to everyone in the room who's in the room
-
           for (const member of sockets) {
             response = {
               result: "success",
