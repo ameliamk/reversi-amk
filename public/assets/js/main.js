@@ -64,7 +64,7 @@ socket.on("join_room_response", (payload) => {
   let nodeB = $("<div></div>");
   nodeB.addClass("col");
   nodeB.addClass("text-end");
-  nodeA.addClass("socket_" + payload.socket_id);
+  nodeB.addClass("socket_" + payload.socket_id);
   nodeB.append("<h4>" + payload.username + "</h4>");
 
   let nodeC = $("<div></div>");
@@ -80,7 +80,6 @@ socket.on("join_room_response", (payload) => {
   $("#players").append(nodeA);
   nodeA.show("fade", 1000);
 
-  // Announce new player
   let newHTML =
     "<p class='join_room_response'>" +
     payload.username +
@@ -89,7 +88,6 @@ socket.on("join_room_response", (payload) => {
     ". (There are " +
     payload.count +
     " users in this room) </p>";
-
   let newNode = $(newHTML);
   newNode.hide();
   $("#messages").prepend(newNode);
@@ -119,7 +117,6 @@ socket.on("player_disconnected", (payload) => {
     ". (There are " +
     payload.count +
     " users in this room) </p>";
-
   let newNode = $(newHTML);
   newNode.hide();
   $("#messages").prepend(newNode);
@@ -148,7 +145,7 @@ socket.on("send_chat_message_response", (payload) => {
     return;
   }
 
-  let newHTML = "<p class='chat_message'> <b>" + payload.username + "</b>: " + payload.message + " </p>";
+  let newHTML = "<p class='chat_message'><b>" + payload.username + "</b>: " + payload.message + "</p>";
   let newNode = $(newHTML);
   newNode.hide();
   $("#messages").prepend(newNode);
@@ -166,7 +163,7 @@ $(() => {
   $("#chatMessage").keypress(function (e) {
     let key = e.which;
     if (key == 13) {
-      $("button[id=chatButton").click();
+      $("button[id=chatButton]").click();
       return false;
     }
   });
