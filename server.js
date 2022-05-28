@@ -256,6 +256,74 @@ io.on("connection", (socket) => {
       });
   });
 
+  // game_start command handler
+  socket.on("game_start", (payload) => {
+    serverLog("server received a command \n'game_start'\n " + JSON.stringify(payload));
+    if (typeof payload == "undefined" || payload === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a payload";
+      socket.emit("game_start_response", response);
+      serverLog("game_start command failed", JSON.stringify(response));
+      return;
+    }
+
+    let requested_user = payload.requested_user;
+    let room = players[socket.id].room;
+    let username = players[socket.id].username;
+
+    if (typeof requested_user == "undefined" || requested_user === null || requested_user === "") {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a valid requested_user to engage in play";
+      socket.emit("game_start_response", response);
+      serverLog("game_start command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof room == "undefined" || room === null || room === "") {
+      response = {};
+      response.result = "fail";
+      response.message = "user that was engaged to play is not in a room";
+      socket.emit("game_start_response", response);
+      serverLog("game_start command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof username == "undefined" || username === null || username === "") {
+      response = {};
+      response.result = "fail";
+      response.message = "user that was engaged to play does not have a name registered";
+      socket.emit("game_start_response", response);
+      serverLog("game_start command failed", JSON.stringify(response));
+      return;
+    }
+
+    // Make sure engaged player is still in the room
+    io.in(room)
+      .allSockets()
+      .then((sockets) => {
+        // engaged player is not in the room
+        if (typeof sockets == "undefined" || sockets === null || !sockets.has(requested_user)) {
+          response = {};
+          response.result = "fail";
+          response.message = "The user that was engaged to play is no longer in the room";
+          socket.emit("game_start_response", response);
+          serverLog("game_start command failed", JSON.stringify(response));
+          // engaged player is in the room
+        } else {
+          let game_id = Math.floor(1 + Math.random() * 0x100000).toString(16);
+          response = {};
+          response.result = "success";
+          response.game_id = game_id;
+          response.socket_id = requested_user;
+          socket.emit("game_start_response", response);
+          socket.to(requested_user).emit("game_start_response", response);
+          serverLog("game_start command succeeded", JSON.stringify(response));
+        }
+      });
+  });
+
   socket.on("disconnect", () => {
     serverLog("a page disconnected from the server: " + socket.id);
     if (typeof players[socket.id] != "undefined" && players[socket.id] != null) {
