@@ -15,7 +15,7 @@ function getIRIParameterValue(requestedKey) {
 
 let username = decodeURI(getIRIParameterValue("username"));
 
-if (typeof username == "undefined" || username === null || username === "null") {
+if (typeof username == "undefined" || username === null || username === "null" || username == "") {
   username = "anonymous_" + Math.floor(Math.random() * 1000);
 }
 
@@ -161,6 +161,8 @@ $(() => {
   request.username = username;
   console.log("**** Client log message, sending 'join_room' command: " + JSON.stringify(request));
   socket.emit("join_room", request);
+
+  $("#lobbyTitle").html(username + "'s Lobby");
 
   $("#chatMessage").keypress(function (e) {
     let key = e.which;
