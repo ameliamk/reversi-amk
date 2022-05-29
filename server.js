@@ -494,7 +494,6 @@ io.on("connection", (socket) => {
     }
 
     // Make sure current play is coming from the expected player
-
     if (
       (game.whose_turn == "white" && game.player_white.socket != socket.id) ||
       (game.whose_turn == "black" && game.player_black.socket != socket.id)
@@ -513,14 +512,16 @@ io.on("connection", (socket) => {
     response.result = "success";
 
     socket.emit("play_token_response", response);
-    // execute move
+    // Execute move
 
     if (color === "white") {
       game.board[row][column] = "w";
       game.whose_turn = "black";
+      game.legal_moves = calculate_legal_moves("b", game.board);
     } else if (color === "black") {
       game.board[row][column] = "b";
       game.whose_turn = "white";
+      game.legal_moves = calculate_legal_moves("w", game.board);
     }
 
     send_game_update(socket, game_id, "played a token");
@@ -544,7 +545,7 @@ function create_new_game() {
   var d = new Date();
   new_game.last_move_time = d.getTime();
 
-  new_game.whose_turn = "white";
+  new_game.whose_turn = "black";
 
   new_game.board = [
     [" ", " ", " ", " ", " ", " ", " ", " "],
@@ -556,7 +557,97 @@ function create_new_game() {
     [" ", " ", " ", " ", " ", " ", " ", " "],
     [" ", " ", " ", " ", " ", " ", " ", " "],
   ];
+
+  new_game.legal_moves = calculate_legal_moves("b", new_game.board);
+
   return new_game;
+}
+
+function check_line_match(color, dr, dc, r, c, board) {
+  if (board[r][c] === color) {
+    return true;
+  }
+  // Check to make sure we aren't going to walk off the board
+  if (r + dr < 0 || r + dr > 7) {
+    return false;
+  }
+  if (c + dc < 0 || c + dc > 7) {
+    return false;
+  }
+
+  // Recursive call
+  return check_line_match(color, dr, dc, r + dr, c + dc, board);
+}
+
+// Return true if r + dr supports playing at r and c + dc supports playing at c
+function adjacent_support(who, dr, dc, r, c, board) {
+  let other;
+  if (who == "b") {
+    other = "w";
+  } else if (who == "w") {
+    other = "b";
+  } else {
+    log("Houston, we have a problem:" + who);
+    return false;
+  }
+
+  // Check to make sure the adjacent support is on the board
+  if (r + dr < 0 || r + dr > 7) {
+    return false;
+  }
+  if (c + dc < 0 || c + dc > 7) {
+    return false;
+  }
+
+  // Check that the opposite color is present
+  if (board[r + dr][c + dc] !== other) {
+    return false;
+  }
+
+  // Check to make sure there's space for a matching color to capture tokens
+  if (r + dr + dr < 0 || r + dr + dr > 7) {
+    return false;
+  }
+  if (c + dc + dc < 0 || c + dc + dc > 7) {
+    return false;
+  }
+
+  return check_line_match(who, dr, dc, r + dr + dr, c + dc + dc, board);
+}
+
+function calculate_legal_moves(who, board) {
+  let legal_moves = [
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+  ];
+
+  for (let row = 0; row < 8; row++) {
+    for (let column = 0; column < 8; column++) {
+      if (board[row][column] === " ") {
+        nw = adjacent_support(who, -1, -1, row, column, board);
+        nn = adjacent_support(who, -1, 0, row, column, board);
+        ne = adjacent_support(who, -1, 1, row, column, board);
+
+        ww = adjacent_support(who, 0, -1, row, column, board);
+        ee = adjacent_support(who, 0, 1, row, column, board);
+
+        sw = adjacent_support(who, 1, -1, row, column, board);
+        ss = adjacent_support(who, 1, 0, row, column, board);
+        se = adjacent_support(who, 1, 1, row, column, board);
+
+        if (nw || nn || ne || ww || ee || sw || ss || se) {
+          legal_moves[row][column] = who;
+        }
+      }
+    }
+  }
+  return legal_moves;
 }
 
 function send_game_update(socket, game_id, message) {
