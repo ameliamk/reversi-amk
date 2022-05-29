@@ -315,7 +315,6 @@ socket.on("game_update", (payload) => {
   }
 
   // Animate changes to board
-
   let whitesum = 0;
   let blacksum = 0;
 
@@ -369,10 +368,16 @@ socket.on("game_update", (payload) => {
         $("#" + row + "_" + column).html(
           '<img class="img-fluid" src="assets/images/' + graphic + "?time=" + t + '" alt="' + altTag + '"/>'
         );
+      }
 
-        $("#" + row + "_" + column).off("click");
+      $("#" + row + "_" + column).off("click");
 
-        if (board[row][column] === " ") {
+      // Set up interactivity
+      $("#" + row + "_" + column).off("click");
+      $("#" + row + "_" + column).removeClass("hovered_over");
+
+      if (payload.game.whose_turn === my_color) {
+        if (payload.game.legal_moves[row][column] === my_color.substr(0, 1)) {
           $("#" + row + "_" + column).addClass("hovered_over");
           $("#" + row + "_" + column).click(
             ((r, c) => {
@@ -387,12 +392,11 @@ socket.on("game_update", (payload) => {
               };
             })(row, column)
           );
-        } else {
-          $("#" + row + "_" + column).removeClass("hovered_over");
         }
       }
     }
   }
+
   $("#whitesum").html(whitesum);
   $("#blacksum").html(blacksum);
 
