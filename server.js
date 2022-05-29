@@ -530,7 +530,6 @@ function create_new_game() {
     [" ", " ", " ", " ", " ", " ", " ", " "],
     [" ", " ", " ", " ", " ", " ", " ", " "],
   ];
-
   return new_game;
 }
 
@@ -540,8 +539,8 @@ function send_game_update(socket, game_id, message) {
     console.log("No game exits with game_id:" + game_id + ". Making a new game for " + socket.id);
     games[game_id] = create_new_game();
   }
-  // Make sure only 2 people in room
 
+  // Make sure only 2 people in room
   io.of("/")
     .to(game_id)
     .allSockets()
@@ -551,9 +550,9 @@ function send_game_update(socket, game_id, message) {
       if (sockets.size >= 1) {
         let first = iterator.next().value;
         if (games[game_id].player_white.socket != first && games[game_id].player_black.socket != first) {
-          // player does not have a color
+          // Player does not have a color
           if (games[game_id].player_white.socket === "") {
-            // this player should be white
+            // This player should be white
             console.log("White is assigned to " + first);
             games[game_id].player_white.socket = first;
             games[game_id].player_white.username = players[first].username;
@@ -562,7 +561,7 @@ function send_game_update(socket, game_id, message) {
             games[game_id].player_black.socket = first;
             games[game_id].player_black.username = players[first].username;
           } else {
-            // this player should be kicked out
+            // This player should be kicked out
             console.log("Kicking " + first + " out of" + game_id);
             io.in(first).socketsLeave([game_id]);
           }
@@ -571,9 +570,9 @@ function send_game_update(socket, game_id, message) {
       if (sockets.size >= 2) {
         let second = iterator.next().value;
         if (games[game_id].player_white.socket != second && games[game_id].player_black.socket != second) {
-          // player does not have a color
+          // Player does not have a color
           if (games[game_id].player_white.socket === "") {
-            // this player should be white
+            // This player should be white
             console.log("White is assigned to " + second);
             games[game_id].player_white.socket = second;
             games[game_id].player_white.username = players[second].username;
@@ -582,7 +581,7 @@ function send_game_update(socket, game_id, message) {
             games[game_id].player_black.socket = second;
             games[game_id].player_black.username = players[second].username;
           } else {
-            // this player should be kicked out
+            // This player should be kicked out
             console.log("Kicking " + second + " out of" + game_id);
             io.in(second).socketsLeave([game_id]);
           }
@@ -600,4 +599,36 @@ function send_game_update(socket, game_id, message) {
     });
 
   // Check if game is over
+  let count = 0;
+  console.log("count", count);
+
+  for (let row = 0; row < 8; row++) {
+    for (let column = 0; column < 8; column++) {
+      if (games[game_id].board[row][column] != " ") {
+        count++;
+      }
+    }
+  }
+
+  console.log("count", count);
+
+  if (count === 64) {
+    let payload = {
+      result: "success",
+      game_id: game_id,
+      game: games[game_id],
+      who_won: "everyone",
+    };
+    io.in(game_id).emit("game_over", payload);
+
+    // Delete old games after 1 hour
+    setTimeout(
+      ((id) => {
+        return () => {
+          delete games[id];
+        };
+      })(game_id),
+      60 * 60 * 1000
+    );
+  }
 }
