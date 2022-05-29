@@ -188,9 +188,7 @@ socket.on("join_room_response", (payload) => {
   let newHTML =
     "<p class='join_room_response'>" +
     payload.username +
-    " joined the " +
-    payload.room +
-    ". (There are " +
+    " joined the chatroom. (There are " +
     payload.count +
     " users in this room) </p>";
   let newNode = $(newHTML);
