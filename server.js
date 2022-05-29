@@ -441,15 +441,63 @@ function send_game_update(socket, game_id, message) {
     games[game_id] = create_new_game();
   }
   // Make sure only 2 people in room
-  // Assign socket a color
-  // Send game update
 
-  let payload = {
-    result: "success",
-    game_id: game_id,
-    game: games[game_id],
-    message: message,
-  };
-  io.of("/").to(game_id).emit("game_update", payload);
+  io.of("/")
+    .to(game_id)
+    .allSockets()
+    .then((sockets) => {
+      // Assign socket a color
+      const iterator = sockets[Symbol.iterator]();
+      if (sockets.size >= 1) {
+        let first = iterator.next().value;
+        if (games[game_id].player_white.socket != first && games[game_id].player_black.socket != first) {
+          // player does not have a color
+          if (games[game_id].player_white.socket === "") {
+            // this player should be white
+            console.log("White is assigned to " + first);
+            games[game_id].player_white.socket = first;
+            games[game_id].player_white.username = players[first].username;
+          } else if (games[game_id].player_black.socket == "") {
+            console.log("Black is assigned to " + first);
+            games[game_id].player_black.socket = first;
+            games[game_id].player_black.username = players[first].username;
+          } else {
+            // this player should be kicked out
+            console.log("Kicking " + first + " out of" + game_id);
+            io.in(first).socketsLeave([game_id]);
+          }
+        }
+      }
+      if (sockets.size >= 2) {
+        let second = iterator.next().value;
+        if (games[game_id].player_white.socket != second && games[game_id].player_black.socket != second) {
+          // player does not have a color
+          if (games[game_id].player_white.socket === "") {
+            // this player should be white
+            console.log("White is assigned to " + second);
+            games[game_id].player_white.socket = second;
+            games[game_id].player_white.username = players[second].username;
+          } else if (games[game_id].player_black.socket == "") {
+            console.log("Black is assigned to " + second);
+            games[game_id].player_black.socket = second;
+            games[game_id].player_black.username = players[second].username;
+          } else {
+            // this player should be kicked out
+            console.log("Kicking " + second + " out of" + game_id);
+            io.in(second).socketsLeave([game_id]);
+          }
+        }
+      }
+
+      // Send game update
+      let payload = {
+        result: "success",
+        game_id: game_id,
+        game: games[game_id],
+        message: message,
+      };
+      io.of("/").to(game_id).emit("game_update", payload);
+    });
+
   // Check if game is over
 }

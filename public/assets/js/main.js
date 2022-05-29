@@ -269,6 +269,8 @@ let old_board = [
   ["?", "?", "?", "?", "?", "?", "?", "?"],
 ];
 
+let my_color = "";
+
 // game update
 socket.on("game_update", (payload) => {
   if (typeof payload == "undefined" || payload === null) {
@@ -288,6 +290,16 @@ socket.on("game_update", (payload) => {
   }
 
   // Update my color
+  if (socket.id === payload.game.player_white.socket) {
+    my_color = "white";
+  } else if (socket.id === payload.game.player_black.socket) {
+    my_color = "black";
+  } else {
+    window.location.href = "lobby.html?username=" + username;
+    return;
+  }
+
+  $("#my_color").html("<h3 id='my_color'> I am " + my_color + "</h3>");
 
   // Animate changes to board
 
