@@ -221,6 +221,7 @@ socket.on("player_disconnected", (payload) => {
     ". (There are " +
     payload.count +
     " users in this room) </p>";
+
   let newNode = $(newHTML);
   newNode.hide();
   $("#messages").prepend(newNode);
@@ -269,7 +270,7 @@ let old_board = [
 
 let my_color = "";
 
-// game update
+// Game update
 socket.on("game_update", (payload) => {
   if (typeof payload == "undefined" || payload === null) {
     console.log("Server did not send a payload");
@@ -297,7 +298,21 @@ socket.on("game_update", (payload) => {
     return;
   }
 
-  $("#my_color").html("<h3 id='my_color'> I am " + my_color + "</h3>");
+  if (my_color == "white") {
+    $("#my_color").html("<h3 id='my_color'> I am white </h3>");
+  } else if (my_color == "black") {
+    $("#my_color").html("<h3 id='my_color'> I am black </h3>");
+  } else {
+    $("#my_color").html("<h3 id='my_color'>Error: Idk what color I am </h3>");
+  }
+
+  if (payload.game.whose_turn == "white") {
+    $("#my_color").append("<h4 id='my_color'> It is white's turn </h4>");
+  } else if (payload.game.whose_turn == "black") {
+    $("#my_color").append("<h4 id='my_color'> It is black's turn </h4>");
+  } else {
+    $("#my_color").append("<h4 id='my_color'>Error: Idk whose turn it is </h4>");
+  }
 
   // Animate changes to board
 
@@ -307,7 +322,6 @@ socket.on("game_update", (payload) => {
   for (let row = 0; row < 8; row++) {
     for (let column = 0; column < 8; column++) {
       // Sum of tokens
-
       if (board[row][column] === "w") {
         whitesum++;
       } else if (board[row][column] === "b") {
@@ -315,7 +329,6 @@ socket.on("game_update", (payload) => {
       }
       if (old_board[row][column] !== board[row][column]) {
         // Check if server changed spaces to the board
-
         let graphic = "";
         let altTag = "";
 
@@ -394,6 +407,7 @@ socket.on("play_token_response", (payload) => {
 
   if (payload.result == "fail") {
     console.log(payload.message);
+    alert(payload.message);
     return;
   }
 });
