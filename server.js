@@ -399,6 +399,106 @@ io.on("connection", (socket) => {
     io.of("/").to(room).emit("send_chat_message_response", response);
     serverLog("send_chat_message command succeeded", JSON.stringify(response));
   });
+
+  socket.on("play_token", (payload) => {
+    serverLog("server received a command \n'send_chat_message'\n " + JSON.stringify(payload));
+    if (typeof payload == "undefined" || payload === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "client did not send a payload";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    let player = players[socket.id];
+    let username = player.username;
+    let game_id = player.room;
+    let row = payload.row;
+    let column = payload.column;
+    let color = payload.color;
+    let game = games[game_id];
+
+    if (typeof player == "undefined" || player === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "play_token came from an unregistered player";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof username == "undefined" || username === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "play_token came from an unregistered username";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof game_id == "undefined" || game_id === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "no valid game associated with play_token command";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof row == "undefined" || row === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "no valid row associated with play_token command";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof column == "undefined" || column === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "no valid row associated with play_token command";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof color == "undefined" || color === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "no valid color associated with play_token command";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    if (typeof game == "undefined" || game === null) {
+      response = {};
+      response.result = "fail";
+      response.message = "no valid game associated with play_token command";
+      socket.emit("play_token_response", response);
+      serverLog("play_token command failed", JSON.stringify(response));
+      return;
+    }
+
+    // Handle the command
+    let response = {};
+    response.result = "success";
+
+    socket.emit("play_token_response", response);
+    // execute move
+
+    if (color === "white") {
+      game.board[row][column] = "w";
+      game.whose_turn = "black";
+    } else if (color === "black") {
+      game.board[row][column] = "b";
+      game.whose_turn = "white";
+    }
+
+    send_game_update(socket, game_id, "played a token");
+  });
 });
 
 // Code related to game state
