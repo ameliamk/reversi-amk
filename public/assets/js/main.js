@@ -227,6 +227,17 @@ socket.on("player_disconnected", (payload) => {
 });
 
 // Chat message functionality
+
+$("#chatMessage").keyup(function (e) {
+  const chatButton = $("#chatButton");
+  const chatMessage = $("#chatMessage").val();
+  if (!!chatMessage) {
+    $("#chatButton").removeAttr("disabled");
+  } else {
+    $("#chatButton").attr("disabled", true);
+  }
+});
+
 function sendChatMessage() {
   let request = {};
   request.room = chatRoom;
