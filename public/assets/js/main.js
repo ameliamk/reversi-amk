@@ -230,7 +230,7 @@ socket.on("player_disconnected", (payload) => {
 
 $("#chatMessage").keyup(function (e) {
   const chatButton = $("#chatButton");
-  const chatMessage = $("#chatMessage").val();
+  const chatMessage = $("#chatMessage").val().trim();
   if (!!chatMessage) {
     $("#chatButton").removeAttr("disabled");
   } else {

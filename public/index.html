@@ -83,7 +83,7 @@
 
       $("#nameInput").keyup(function (e) {
         const lobbyButton = $("#lobbyButton");
-        const nameInputValue = $("#nameInput").val();
+        const nameInputValue = $("#nameInput").val().trim();
         if (!!nameInputValue) {
           $("#lobbyButton").removeAttr("disabled");
           let key = e.which;
