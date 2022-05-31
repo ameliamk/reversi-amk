@@ -306,9 +306,11 @@ socket.on("game_update", (payload) => {
   }
 
   if (payload.game.whose_turn == "white") {
-    $("#my_color").append("<h4 id='my_color'> It is white's turn </h4>");
+    const playerWhite = payload.game.player_white.username;
+    $("#my_color").append("<h4 id='my_color'> It is " + playerWhite + "'s turn </h4>");
   } else if (payload.game.whose_turn == "black") {
-    $("#my_color").append("<h4 id='my_color'> It is black's turn </h4>");
+    const playerBlack = payload.game.player_black.username;
+    $("#my_color").append("<h4 id='my_color'> It is " + playerBlack + "'s turn </h4>");
   } else {
     $("#my_color").append("<h4 id='my_color'>Error: Idk whose turn it is </h4>");
   }
