@@ -8,12 +8,13 @@ body {
 
 #message_pane {
   background-color: rgb(183, 183, 183);
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 
 .join_room_response,
 .left_room_response {
-  margin: 10px 1px 1px 10px;
+  margin: 10px 1px 1px 0px;
   background-color: lightgray;
 }
 

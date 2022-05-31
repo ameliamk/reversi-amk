@@ -73,7 +73,7 @@ function makePlayButton(socket_id) {
 }
 
 function makeStartGameButton() {
-  let newHTML = "<button type='button' class='btn btn-danger'> Starting Game </button>";
+  let newHTML = "<button type='button' class='btn btn-danger'> Starting </button>";
   let newNode = $(newHTML);
   return newNode;
 }
