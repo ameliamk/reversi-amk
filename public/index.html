@@ -15,22 +15,30 @@
       body {
         background-color: lightgray;
       }
+
+      .navbar-brand,
+      #navbarText {
+        padding: 10px 100px;
+      }
     </style>
 
     <script></script>
     <title>Reversi</title>
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row m-3">
-        <div class="col text-center">
-          <a class="btn btn-success text-nowrap" href="about.html">About </a>
-        </div>
-        <div class="col text-center">
-          <a class="btn btn-success text-nowrap" href="https://en.wikipedia.org/wiki/Reversi">Rules </a>
-        </div>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">Reversi</a>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" target="_blank" href="https://en.wikipedia.org/wiki/Reversi">Rules</a>
+          </li>
+        </ul>
       </div>
-    </div>
+    </nav>
     <div class="row m-3">
       <div class="col text-center">
         <img class="img-fluid" src="/assets/images/top-splash.png" alt="Reversi Logo 1" />
