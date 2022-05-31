@@ -48,7 +48,13 @@
             aria-label="Enter your display name for use while playing Reversi"
             aria-describedby="displayName"
           />
-          <button type="submit" id="lobbyButton" class="btn btn-primary text-nowrap" onclick="goToLobby()">
+          <button
+            type="submit"
+            id="lobbyButton"
+            class="btn btn-disabled btn-primary text-nowrap"
+            onclick="goToLobby()"
+            disabled
+          >
             Enter Lobby
           </button>
         </div>
@@ -74,11 +80,19 @@
         let username = encodeURI($("#nameInput").val());
         window.location.href = "lobby.html?username=" + username;
       }
-      $("#nameInput").keypress(function (e) {
-        let key = e.which;
-        if (key == 13) {
-          $("button[id=lobbyButton").click();
-          return false;
+
+      $("#nameInput").keyup(function (e) {
+        const lobbyButton = $("#lobbyButton");
+        const nameInputValue = $("#nameInput").val();
+        if (!!nameInputValue) {
+          $("#lobbyButton").removeAttr("disabled");
+          let key = e.which;
+          if (key == 13) {
+            $("button[id=lobbyButton").click();
+            return false;
+          }
+        } else {
+          $("#lobbyButton").attr("disabled", true);
         }
       });
     </script>
